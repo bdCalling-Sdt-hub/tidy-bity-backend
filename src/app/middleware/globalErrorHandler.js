@@ -8,6 +8,7 @@ const { MulterError } = require("multer");
 const handleMulterError = require("../../error/handleMulterError");
 const createErrorMessage = require("../../util/createErrorMessage");
 const { errorLogger } = require("../../shared/logger");
+const handleNetworkError = require("../../error/handleNetworkError");
 
 const globalErrorHandler = (error, req, res, next) => {
   const logError = config.env === "development" ? console.log : console.error;
@@ -71,6 +72,7 @@ const globalErrorHandler = (error, req, res, next) => {
       errorMessages: createErrorMessage(error.message),
     }),
     MulterError: () => handleMulterError(error),
+    NetworkError: () => handleNetworkError(error),
   };
 
   // Determine the specific error handler
@@ -79,10 +81,11 @@ const globalErrorHandler = (error, req, res, next) => {
     (error instanceof JsonWebTokenError && errorHandlers.JsonWebTokenError) ||
     (error instanceof TokenExpiredError && errorHandlers.TokenExpiredError) ||
     (error instanceof ApiError && errorHandlers.ApiError) ||
-    (error.code === 11000 && errorHandlers.DuplicateKeyError) ||
     (error instanceof TypeError && errorHandlers.TypeError) ||
     (error instanceof mongooseError && errorHandlers.mongooseError) ||
-    (error instanceof MulterError && errorHandlers.MulterError);
+    (error instanceof MulterError && errorHandlers.MulterError) ||
+    (error.code === 11000 && errorHandlers.DuplicateKeyError) ||
+    (error.code === "ECONNRESET" && errorHandlers.NetworkError);
 
   if (errorType) {
     ({ statusCode, message, errorMessages } = errorType());
