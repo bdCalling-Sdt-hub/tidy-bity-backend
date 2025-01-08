@@ -19,7 +19,7 @@ router
     uploadFile(),
     RoomController.postRoom
   )
-  .post("/get-my-room", auth(config.auth_level.user), RoomController.getMyRoom)
+  .get("/get-my-room", auth(config.auth_level.user), RoomController.getMyRoom)
   .get(
     "/get-single-room",
     auth(config.auth_level.user),
@@ -28,6 +28,7 @@ router
   .patch(
     "/edit-single-room",
     auth(config.auth_level.user),
+    uploadFile(),
     RoomController.editSingleRoom
   )
   .delete(

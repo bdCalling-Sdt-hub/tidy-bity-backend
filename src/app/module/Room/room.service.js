@@ -19,7 +19,10 @@ const postHouse = async (userData, payload) => {
 const getSingleHouse = async (query) => {
   validateFields(query, ["houseId"]);
 
-  return await House.findById(query.houseId);
+  const house = await House.findById(query.houseId);
+  if (!house) throw new ApiError(status.NOT_FOUND, "House not found");
+
+  return house;
 };
 
 const postRoom = async (req) => {
@@ -46,9 +49,28 @@ const postRoom = async (req) => {
   return await Room.create(roomData);
 };
 
-const getMyRoom = async (userData, query) => {};
+const getMyRoom = async (userData, query) => {
+  validateFields(query, ["houseId"]);
 
-const getSingleRoom = async (query) => {};
+  const rooms = await Room.find({
+    user: userData.userId,
+    house: query.houseId,
+  });
+
+  return {
+    count: rooms.length,
+    rooms,
+  };
+};
+
+const getSingleRoom = async (query) => {
+  validateFields(query, ["roomId"]);
+
+  const room = await Room.findById(query.roomId);
+  if (!room) throw new ApiError(status.NOT_FOUND, "Room not found");
+
+  return room;
+};
 
 const editSingleRoom = async (payload) => {};
 
