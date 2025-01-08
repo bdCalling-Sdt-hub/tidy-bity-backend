@@ -1,4 +1,4 @@
-const catchAsync = require("../../../shared/catchasync");
+const catchAsync = require("../../../shared/catchAsync");
 const DashboardService = require("./dashboard.service");
 
 // overview ========================
