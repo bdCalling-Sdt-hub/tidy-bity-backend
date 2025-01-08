@@ -2,6 +2,8 @@ const { default: status } = require("http-status");
 const validateFields = require("../../../util/validateFields");
 const Room = require("./Room");
 const House = require("../house/House");
+const ApiError = require("../../../error/ApiError");
+const postNotification = require("../../../util/postNotification");
 
 const postHouse = async (userData, payload) => {
   validateFields(payload, ["name"]);
@@ -14,16 +16,32 @@ const postHouse = async (userData, payload) => {
   return await House.create(houseData);
 };
 
-const getSingHouse = async (query) => {};
+const getSingleHouse = async (query) => {
+  validateFields(query, ["houseId"]);
 
-const postRoom = async (userData, payload) => {
+  return await House.findById(query.houseId);
+};
+
+const postRoom = async (req) => {
+  const { body: payload, user, files } = req;
+  validateFields(files, ["roomImage"]);
   validateFields(payload, ["houseId", "name"]);
 
+  const house = await House.findOne({
+    _id: payload.houseId,
+    user: user.userId,
+  });
+
+  if (!house) throw new ApiError(status.NOT_FOUND, "House not found");
+
   const roomData = {
-    user: userData.userId,
+    user: user.userId,
     house: payload.houseId,
     name: payload.name,
+    roomImage: files.roomImage[0].path,
   };
+
+  postNotification("New Room", "New room added to your house", user.userId);
 
   return await Room.create(roomData);
 };
@@ -38,7 +56,7 @@ const deleteSingleRoom = async (payload) => {};
 
 const RoomService = {
   postHouse,
-  getSingHouse,
+  getSingleHouse,
   postRoom,
   getMyRoom,
   getSingleRoom,

@@ -12,8 +12,8 @@ const postHouse = catchAsync(async (req, res) => {
   });
 });
 
-const getSingHouse = catchAsync(async (req, res) => {
-  const result = await RoomService.getSingHouse(req.query);
+const getSingleHouse = catchAsync(async (req, res) => {
+  const result = await RoomService.getSingleHouse(req.query);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -23,7 +23,7 @@ const getSingHouse = catchAsync(async (req, res) => {
 });
 
 const postRoom = catchAsync(async (req, res) => {
-  const result = await RoomService.postRoom(req.user, req.body);
+  const result = await RoomService.postRoom(req);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -74,7 +74,7 @@ const deleteSingleRoom = catchAsync(async (req, res) => {
 
 const RoomController = {
   postHouse,
-  getSingHouse,
+  getSingleHouse,
   postRoom,
   getMyRoom,
   getSingleRoom,
