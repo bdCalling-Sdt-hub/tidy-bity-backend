@@ -4,6 +4,7 @@ const Room = require("./Room");
 const House = require("../house/House");
 const ApiError = require("../../../error/ApiError");
 const postNotification = require("../../../util/postNotification");
+const deleteFalsyField = require("../../../util/deleteFalsyField");
 
 const postHouse = async (userData, payload) => {
   validateFields(payload, ["name"]);
@@ -72,9 +73,36 @@ const getSingleRoom = async (query) => {
   return room;
 };
 
-const editSingleRoom = async (payload) => {};
+const editSingleRoom = async (req) => {
+  const { body: payload, user, files } = req;
+  validateFields(payload, ["roomId"]);
 
-const deleteSingleRoom = async (payload) => {};
+  const data = { ...payload };
+  if (files && files.roomImage) data.roomImage = files.roomImage[0].path;
+  const newData = deleteFalsyField(data);
+
+  const updatedRoom = await Room.updateOne(
+    { _id: payload.roomId },
+    { ...newData }
+  );
+
+  if (!updatedRoom.matchedCount)
+    throw new ApiError(status.NOT_FOUND, "Room not found");
+
+  postNotification("Room Updated", "New data updated to room", user.userId);
+  return updatedRoom;
+};
+
+const deleteSingleRoom = async (payload) => {
+  validateFields(payload, ["roomId"]);
+
+  const result = await Room.deleteOne({ _id: payload.roomId });
+
+  if (!result.deletedCount)
+    throw new ApiError(status.NOT_FOUND, "Room not found");
+
+  return result;
+};
 
 const RoomService = {
   postHouse,

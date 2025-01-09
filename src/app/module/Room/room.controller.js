@@ -53,7 +53,7 @@ const getSingleRoom = catchAsync(async (req, res) => {
 });
 
 const editSingleRoom = catchAsync(async (req, res) => {
-  const result = await RoomService.editSingleRoom(req.body);
+  const result = await RoomService.editSingleRoom(req);
   sendResponse(res, {
     statusCode: 200,
     success: true,
