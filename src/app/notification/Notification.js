@@ -1,24 +1,23 @@
 const { Schema, model } = require("mongoose");
 const ObjectId = Schema.Types.ObjectId;
 
-const RoomSchema = new Schema(
+const notificationSchema = new Schema(
   {
-    user: {
+    toId: {
       type: ObjectId,
-      ref: "User",
       required: true,
     },
-    house: {
-      type: ObjectId,
-      ref: "House",
-      required: true,
-    },
-    name: {
+    title: {
       type: String,
       required: true,
     },
-    roomImage: {
+    message: {
       type: String,
+      required: true,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -26,6 +25,6 @@ const RoomSchema = new Schema(
   }
 );
 
-const Room = model("Room", RoomSchema);
+const Notification = model("Notification", notificationSchema);
 
-module.exports = Room;
+module.exports = Notification;
