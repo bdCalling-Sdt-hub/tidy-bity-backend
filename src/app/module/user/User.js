@@ -29,6 +29,48 @@ const UserSchema = new Schema(
     address: {
       type: String,
     },
+
+    /* employee only fields -----------*/
+
+    employer: {
+      type: String,
+    },
+    employeeId: {
+      type: String,
+    },
+    designation: {
+      type: String,
+    },
+    jobType: {
+      type: String,
+    },
+    CPR: {
+      type: String,
+    },
+    passport: {
+      type: String,
+    },
+    drivingLicense: {
+      type: String,
+    },
+    dutyTime: {
+      type: String,
+    },
+    workingDay: {
+      type: [String],
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+    },
+    offDay: {
+      type: String,
+    },
   },
   {
     timestamps: true,

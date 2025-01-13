@@ -3,6 +3,9 @@ const { status } = require("http-status");
 const ApiError = require("../../../error/ApiError");
 const User = require("./User");
 const Auth = require("../auth/Auth");
+const validateFields = require("../../../util/validateFields");
+const { ENUM_USER_ROLE } = require("../../../util/enum");
+const EmailHelpers = require("../../../util/emailHelpers");
 
 const updateProfile = async (req) => {
   const { files, body: data } = req;
@@ -70,10 +73,85 @@ const deleteMyAccount = async (payload) => {
   ]);
 };
 
+const addEmployee = async (req) => {
+  const { body: payload, files, user } = req;
+
+  validateFields(files, ["profile_image"]);
+  validateFields(payload, [
+    "name",
+    "email",
+    "password",
+    "phoneNumber",
+    "address",
+    "designation",
+    "jobType",
+    "CPR",
+    "passport",
+    "drivingLicense",
+    "dutyTime",
+    "workingDay",
+    "offDay",
+  ]);
+
+  const authData = {
+    name: payload.name,
+    email: payload.email,
+    password: payload.password,
+    role: ENUM_USER_ROLE.EMPLOYEE,
+    isActive: true,
+  };
+
+  const auth = await Auth.create(authData);
+
+  const employeeData = {
+    authId: auth._id,
+    name: payload.name,
+    email: payload.email,
+    profile_image: files.profile_image[0].path,
+    phoneNumber: payload.phoneNumber,
+    address: payload.address,
+    employer: user.userId,
+    designation: payload.designation,
+    jobType: payload.jobType,
+    CPR: payload.CPR,
+    passport: payload.passport,
+    drivingLicense: payload.drivingLicense,
+    dutyTime: payload.dutyTime,
+    workingDay: JSON.parse(payload.workingDay),
+    offDay: payload.offDay,
+  };
+
+  const employee = await User.create(employeeData);
+
+  employee.employeeId = employee._id.toString().toUpperCase();
+  await employee.save();
+
+  EmailHelpers.sendAddEmployeeTemp(payload.email, {
+    password: payload.password,
+    workDays: employeeData.workingDay.join(", "),
+    ...employee.toObject(),
+  });
+
+  return employee;
+};
+
+const editEmployee = async (req) => {};
+
+const deleteEmployee = async (userData, payload) => {};
+
+const getMyEmployee = async (userData) => {};
+
+const getSingleEmployee = async (query) => {};
+
 const UserService = {
   getProfile,
   deleteMyAccount,
   updateProfile,
+  addEmployee,
+  editEmployee,
+  deleteEmployee,
+  getMyEmployee,
+  getSingleEmployee,
 };
 
 module.exports = { UserService };

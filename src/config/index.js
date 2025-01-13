@@ -21,6 +21,7 @@ const config = {
   database_url: process.env.MONGO_URL,
   database_password: process.env.DB_PASSWORD,
   auth_level: {
+    employee: ["USER", "EMPLOYEE", "ADMIN", "SUPER_ADMIN"],
     user: ["USER", "ADMIN", "SUPER_ADMIN"],
     admin: ["ADMIN", "SUPER_ADMIN"],
     super_admin: ["SUPER_ADMIN"],
