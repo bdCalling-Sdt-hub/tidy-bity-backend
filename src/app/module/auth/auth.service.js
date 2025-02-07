@@ -15,28 +15,31 @@ const validateFields = require("../../../util/validateFields");
 const EmailHelpers = require("../../../util/emailHelpers");
 
 const registrationAccount = async (payload) => {
-  const { role, name, password, confirmPassword, email } = payload;
+  const { role, firstName, lastName, password, confirmPassword, email } =
+    payload;
 
   validateFields(payload, [
     "password",
     "confirmPassword",
     "email",
     "role",
-    "name",
+    "firstName",
+    "lastName",
   ]);
 
   const { code: activationCode, expiredAt: activationCodeExpire } =
     codeGenerator(3);
   const authData = {
     role,
-    name,
+    firstName,
+    lastName,
     email,
     password,
     activationCode,
     activationCodeExpire,
   };
   const data = {
-    user: name,
+    user: `${firstName} ${lastName}`,
     activationCode,
     activationCodeExpire: Math.round(
       (activationCodeExpire - Date.now()) / (60 * 1000)
@@ -75,7 +78,8 @@ const registrationAccount = async (payload) => {
 
   const userData = {
     authId: auth._id,
-    name,
+    firstName,
+    lastName,
     email,
   };
 
@@ -217,7 +221,7 @@ const forgotPass = async (payload) => {
   await user.save();
 
   const data = {
-    name: user.name,
+    user: `${firstName} ${lastName}`,
     verificationCode,
     verificationCodeExpire: Math.round(
       (verificationCodeExpire - Date.now()) / (60 * 1000)

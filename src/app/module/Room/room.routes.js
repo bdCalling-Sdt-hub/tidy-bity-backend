@@ -13,6 +13,11 @@ router
     auth(config.auth_level.user),
     RoomController.getSingleHouse
   )
+  .get(
+    "/get-my-houses",
+    auth(config.auth_level.user),
+    RoomController.getMyHouses
+  )
   .post(
     "/post-room",
     auth(config.auth_level.user),

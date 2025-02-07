@@ -21,7 +21,10 @@ const updateProfile = async (req) => {
   const [auth, user] = await Promise.all([
     Auth.findByIdAndUpdate(
       authId,
-      { name: updateData.name },
+      {
+        firstName: updateData.firstName,
+        lastName: updateData.lastName,
+      },
       {
         new: true,
       }
@@ -78,7 +81,8 @@ const addEmployee = async (req) => {
 
   validateFields(files, ["profile_image"]);
   validateFields(payload, [
-    "name",
+    "firstName",
+    "lastName",
     "email",
     "password",
     "phoneNumber",
@@ -94,7 +98,8 @@ const addEmployee = async (req) => {
   ]);
 
   const authData = {
-    name: payload.name,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
     email: payload.email,
     password: payload.password,
     role: ENUM_USER_ROLE.EMPLOYEE,
@@ -105,7 +110,8 @@ const addEmployee = async (req) => {
 
   const employeeData = {
     authId: auth._id,
-    name: payload.name,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
     email: payload.email,
     profile_image: files.profile_image[0].path,
     phoneNumber: payload.phoneNumber,
@@ -129,6 +135,7 @@ const addEmployee = async (req) => {
   EmailHelpers.sendAddEmployeeTemp(payload.email, {
     password: payload.password,
     workDays: employeeData.workingDay.join(", "),
+    name: `${payload.firstName} ${payload.lastName}`,
     ...employee.toObject(),
   });
 
@@ -137,22 +144,33 @@ const addEmployee = async (req) => {
 
 const editEmployee = async (req) => {
   const { body: payload, files, user: userData } = req;
-  const updateData = { ...payload };
+
   validateFields(payload, ["authId", "userId"]);
 
+  const updateData = {
+    ...(payload.workingDay && { workingDay: JSON.parse(payload.workingDay) }),
+    ...payload,
+  };
+
+  // return updateData;
+
+  const employee = await User.findOne({
+    _id: payload.userId,
+    authId: payload.authId,
+  });
+
+  if (!employee) throw new ApiError(status.BAD_REQUEST, "Employee not found");
+
   if (payload.email || payload.password)
-    throw new ApiError(
-      status.BAD_REQUEST,
-      "Email or Password can't be changed"
-    );
+    throw new ApiError(status.BAD_REQUEST, "Email & Password can't be changed");
 
   if (files && files.profile_image)
     updateData.profile_image = files.profile_image[0].path;
 
-  const [auth, user] = await Promise.all([
+  const [auth, updatedEmployee] = await Promise.all([
     Auth.findByIdAndUpdate(
       payload.authId,
-      { name: updateData.name },
+      { firstName: updateData.firstName, lastName: updateData.lastName },
       {
         new: true,
       }
@@ -163,10 +181,16 @@ const editEmployee = async (req) => {
       {
         new: true,
       }
-    ).populate("authId"),
+    ),
   ]);
 
-  if (!auth || !user) throw new ApiError(status.NOT_FOUND, "User not found!");
+  if (!auth || !updatedEmployee)
+    throw new ApiError(status.NOT_FOUND, "User not found!");
+
+  return {
+    auth,
+    updatedEmployee,
+  };
 };
 
 const deleteEmployee = async (userData, payload) => {};

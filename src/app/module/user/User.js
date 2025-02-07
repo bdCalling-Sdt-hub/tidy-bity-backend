@@ -8,7 +8,11 @@ const UserSchema = new Schema(
       required: true,
       ref: "Auth",
     },
-    name: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
