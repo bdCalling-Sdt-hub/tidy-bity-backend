@@ -7,17 +7,44 @@ const config = require("../../../config");
 const router = express.Router();
 
 router
-  .get("/profile", auth(config.auth_level.user), UserController.getProfile)
+  .get("/profile", auth(config.auth_level.employee), UserController.getProfile)
   .patch(
     "/edit-profile",
-    auth(config.auth_level.user),
+    auth(config.auth_level.employee),
     uploadFile(),
     UserController.updateProfile
   )
   .delete(
     "/delete-account",
-    auth(config.auth_level.user),
+    auth(config.auth_level.employee),
     UserController.deleteMyAccount
+  )
+  .post(
+    "/add-employee",
+    auth(config.auth_level.user),
+    uploadFile(),
+    UserController.addEmployee
+  )
+  .patch(
+    "/edit-employee",
+    auth(config.auth_level.user),
+    uploadFile(),
+    UserController.editEmployee
+  )
+  .delete(
+    "/delete-employee",
+    auth(config.auth_level.user),
+    UserController.deleteEmployee
+  )
+  .get(
+    "/get-my-employee",
+    auth(config.auth_level.user),
+    UserController.getMyEmployee
+  )
+  .get(
+    "/get-single-employee",
+    auth(config.auth_level.user),
+    UserController.getSingleEmployee
   );
 
 module.exports = router;

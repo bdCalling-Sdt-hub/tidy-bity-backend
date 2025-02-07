@@ -22,6 +22,16 @@ const getSingleHouse = catchAsync(async (req, res) => {
   });
 });
 
+const getMyHouses = catchAsync(async (req, res) => {
+  const result = await RoomService.getMyHouses(req.user, req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Houses retrieved successfully",
+    data: result,
+  });
+});
+
 const postRoom = catchAsync(async (req, res) => {
   const result = await RoomService.postRoom(req);
   sendResponse(res, {
@@ -75,6 +85,7 @@ const deleteSingleRoom = catchAsync(async (req, res) => {
 const RoomController = {
   postHouse,
   getSingleHouse,
+  getMyHouses,
   postRoom,
   getMyRoom,
   getSingleRoom,

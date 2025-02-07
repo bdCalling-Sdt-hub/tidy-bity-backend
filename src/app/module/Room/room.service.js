@@ -26,6 +26,17 @@ const getSingleHouse = async (query) => {
   return house;
 };
 
+const getMyHouses = async (userData, query) => {
+  const houses = await House.find({
+    user: userData.userId,
+  });
+
+  return {
+    count: houses.length,
+    houses,
+  };
+};
+
 const postRoom = async (req) => {
   const { body: payload, user, files } = req;
   validateFields(files, ["roomImage"]);
@@ -107,6 +118,7 @@ const deleteSingleRoom = async (payload) => {
 const RoomService = {
   postHouse,
   getSingleHouse,
+  getMyHouses,
   postRoom,
   getMyRoom,
   getSingleRoom,

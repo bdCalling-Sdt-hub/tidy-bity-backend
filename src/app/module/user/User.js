@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-
-const { Schema, model, Types } = mongoose;
+const { Schema, model, Types } = require("mongoose");
+const ObjectId = Schema.Types.ObjectId;
 
 const UserSchema = new Schema(
   {
@@ -9,7 +8,11 @@ const UserSchema = new Schema(
       required: true,
       ref: "Auth",
     },
-    name: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
@@ -27,6 +30,49 @@ const UserSchema = new Schema(
       type: String,
     },
     address: {
+      type: String,
+    },
+
+    /* employee only fields -----------*/
+
+    employer: {
+      type: ObjectId,
+      ref: "User",
+    },
+    employeeId: {
+      type: String,
+    },
+    designation: {
+      type: String,
+    },
+    jobType: {
+      type: String,
+    },
+    CPR: {
+      type: String,
+    },
+    passport: {
+      type: String,
+    },
+    drivingLicense: {
+      type: String,
+    },
+    dutyTime: {
+      type: String,
+    },
+    workingDay: {
+      type: [String],
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+    },
+    offDay: {
       type: String,
     },
   },
