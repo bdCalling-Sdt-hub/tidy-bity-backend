@@ -15,3 +15,7 @@ Task Tamers
 1. auth
 2. errorhandler updated with network error
 3. validateFields modified
+4. console in all email senders.
+5. email temp for booking
+6. all util, shared, helper functions.
+7. cors in another folder

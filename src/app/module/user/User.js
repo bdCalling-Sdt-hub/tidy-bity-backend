@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-
-const { Schema, model, Types } = mongoose;
+const { Schema, model, Types } = require("mongoose");
+const ObjectId = Schema.Types.ObjectId;
 
 const UserSchema = new Schema(
   {
@@ -33,7 +32,8 @@ const UserSchema = new Schema(
     /* employee only fields -----------*/
 
     employer: {
-      type: String,
+      type: ObjectId,
+      ref: "User",
     },
     employeeId: {
       type: String,
