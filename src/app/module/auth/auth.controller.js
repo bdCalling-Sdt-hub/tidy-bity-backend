@@ -89,6 +89,15 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
+const resendActivationCode = catchAsync(async (req, res) => {
+  await AuthService.resendActivationCode(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Resent successfully",
+  });
+});
+
 const AuthController = {
   registrationAccount,
   activateAccount,
@@ -97,6 +106,7 @@ const AuthController = {
   forgotPass,
   resetPassword,
   forgetPassOtpVerify,
+  resendActivationCode,
 };
 
 module.exports = { AuthController };
