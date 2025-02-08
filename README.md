@@ -19,3 +19,5 @@ Task Tamers
 5. email temp for booking
 6. all util, shared, helper functions.
 7. cors in another folder
+8. activation-code-resend api
+9. remove node-cron as much as possible

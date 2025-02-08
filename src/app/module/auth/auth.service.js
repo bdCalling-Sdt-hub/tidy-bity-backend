@@ -22,7 +22,6 @@ const registrationAccount = async (payload) => {
     "password",
     "confirmPassword",
     "email",
-    "role",
     "firstName",
     "lastName",
   ]);
@@ -93,6 +92,28 @@ const registrationAccount = async (payload) => {
     isActive: false,
     message: "Account created successfully. Please check your email",
   };
+};
+
+const resendActivationCode = async (payload) => {
+  const email = payload.email;
+  const user = await Auth.findOne({ email: email });
+  if (!user) throw new ApiError(status.BAD_REQUEST, "Email not found!");
+
+  const { code: activationCode, expiredAt: activationCodeExpire } =
+    codeGenerator(3);
+  const data = {
+    user: `${user.firstName} ${user.lastName}`,
+    activationCode,
+    activationCodeExpire: Math.round(
+      (activationCodeExpire - Date.now()) / (60 * 1000)
+    ),
+  };
+
+  user.activationCode = activationCode;
+  user.activationCodeExpire = activationCodeExpire;
+  await user.save();
+
+  EmailHelpers.sendOtpResendEmail(email, data);
 };
 
 const activateAccount = async (payload) => {
@@ -221,7 +242,7 @@ const forgotPass = async (payload) => {
   await user.save();
 
   const data = {
-    user: `${firstName} ${lastName}`,
+    user: `${user.firstName} ${user.lastName}`,
     verificationCode,
     verificationCodeExpire: Math.round(
       (verificationCodeExpire - Date.now()) / (60 * 1000)
@@ -368,6 +389,7 @@ const AuthService = {
   resetPassword,
   activateAccount,
   forgetPassOtpVerify,
+  resendActivationCode,
 };
 
 module.exports = { AuthService };
