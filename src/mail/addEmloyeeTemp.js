@@ -95,16 +95,24 @@ const addEmployeeTemp = (data) =>
               <td>${data.jobType}</td>
             </tr>
             <tr>
-              <th>CPR</th>
-              <td>${data.CPR}</td>
+              <th>CPR Number</th>
+              <td>${data.CPRNumber}</td>
             </tr>
             <tr>
-              <th>Passport</th>
-              <td>${data.passport}</td>
+              <th>CPR Expiry Date</th>
+              <td>${data.CPRExpDate}</td>
             </tr>
             <tr>
-              <th>Driving License</th>
-              <td>${data.drivingLicense}</td>
+              <th>Passport Number</th>
+              <td>${data.passportNumber}</td>
+            </tr>
+            <tr>
+              <th>Passport Expiry Date</th>
+              <td>${data.passportExpDate}</td>
+            </tr>
+            <tr>
+              <th>Passport Expiry Date</th>
+              <td>${data.passportExpDate}</td>
             </tr>
             <tr>
               <th>Working Days</th>

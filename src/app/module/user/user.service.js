@@ -6,6 +6,7 @@ const Auth = require("../auth/Auth");
 const validateFields = require("../../../util/validateFields");
 const { ENUM_USER_ROLE } = require("../../../util/enum");
 const EmailHelpers = require("../../../util/emailHelpers");
+const convertToArray = require("../../../util/convertToArray");
 
 const updateProfile = async (req) => {
   const { files, body: data } = req;
@@ -89,9 +90,10 @@ const addEmployee = async (req) => {
     "address",
     "designation",
     "jobType",
-    "CPR",
-    "passport",
-    "drivingLicense",
+    "CPRNumber",
+    "CPRExpDate",
+    "passportNumber",
+    "passportExpDate",
     "dutyTime",
     "workingDay",
     "offDay",
@@ -119,11 +121,13 @@ const addEmployee = async (req) => {
     employer: user.userId,
     designation: payload.designation,
     jobType: payload.jobType,
-    CPR: payload.CPR,
-    passport: payload.passport,
-    drivingLicense: payload.drivingLicense,
+    CPRNumber: payload.CPRNumber,
+    CPRExpDate: payload.CPRExpDate,
+    passportNumber: payload.passportNumber,
+    passportExpDate: payload.passportExpDate,
+    note: payload.note,
     dutyTime: payload.dutyTime,
-    workingDay: JSON.parse(payload.workingDay),
+    workingDay: convertToArray(payload.workingDay),
     offDay: payload.offDay,
   };
 
@@ -144,15 +148,26 @@ const addEmployee = async (req) => {
 
 const editEmployee = async (req) => {
   const { body: payload, files, user: userData } = req;
+  const { workingDay } = payload || {};
 
   validateFields(payload, ["authId", "userId"]);
 
+  // return {
+  //   type: typeof payload.workingDay,
+  //   payload: payload.workingDay,
+  //   payload2: JSON.parse(payload.workingDay),
+  // };
+
   const updateData = {
-    ...(payload.workingDay && { workingDay: JSON.parse(payload.workingDay) }),
+    ...(workingDay && {
+      workingDay:
+        // typeof workingDay === "string" ? JSON.parse(workingDay) : workingDay,
+        typeof workingDay === "string" ? workingDay : JSON.parse(workingDay),
+    }),
     ...payload,
   };
 
-  // return updateData;
+  return updateData;
 
   const employee = await User.findOne({
     _id: payload.userId,

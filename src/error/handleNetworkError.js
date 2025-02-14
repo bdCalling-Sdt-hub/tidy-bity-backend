@@ -13,6 +13,8 @@ const handleNetworkError = (error) => {
       break;
     case "ETIMEDOUT":
       message = "The connection timed out";
+    case "EADDRINUSE":
+      message = "The port is running somewhere else";
       break;
     default:
       message = defaultMsg || "A network error occurred";
