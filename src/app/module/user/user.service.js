@@ -197,7 +197,19 @@ const editEmployee = async (req) => {
   };
 };
 
-const deleteEmployee = async (userData, payload) => {};
+const deleteEmployee = async (userData, payload) => {
+  validateFields(payload, ["userId", "authId"]);
+
+  const deletedUser = await User.deleteOne({
+    _id: payload.userId,
+    employer: userData.userId,
+  });
+
+  if (!deletedUser.deletedCount)
+    throw new ApiError(status.NOT_FOUND, "Employee Not found");
+
+  const deletedAuth = await Auth.deleteOne({ _id: payload.authId });
+};
 
 const getMyEmployee = async (userData, query) => {
   const myEmployeesQuery = new QueryBuilder(
@@ -221,7 +233,15 @@ const getMyEmployee = async (userData, query) => {
   };
 };
 
-const getSingleEmployee = async (query) => {};
+const getSingleEmployee = async (query) => {
+  validateFields(query, ["userId"]);
+
+  const employee = await User.findById(query.userId);
+
+  if (!employee) throw new ApiError(status.NOT_FOUND, "Employee not found");
+
+  return employee;
+};
 
 const UserService = {
   getProfile,
