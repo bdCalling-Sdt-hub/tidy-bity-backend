@@ -62,7 +62,7 @@ const deleteEmployee = catchAsync(async (req, res) => {
 });
 
 const getMyEmployee = catchAsync(async (req, res) => {
-  const result = await UserService.getMyEmployee(req.user);
+  const result = await UserService.getMyEmployee(req.user, req.query);
   sendResponse(res, {
     statusCode: 200,
     success: true,
