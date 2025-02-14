@@ -39,24 +39,36 @@ const getMyHouses = async (userData, query) => {
 
 const postRoom = async (req) => {
   const { body: payload, user, files } = req;
-  validateFields(files, ["roomImage"]);
-  validateFields(payload, ["houseId", "name"]);
 
-  const house = await House.findOne({
+  validateFields(files, ["roomImage"]);
+  validateFields(payload, ["roomName"]);
+
+  let house = await House.findOne({
     _id: payload.houseId,
     user: user.userId,
   });
 
-  if (!house) throw new ApiError(status.NOT_FOUND, "House not found");
+  if (!house) {
+    validateFields(payload, ["houseName"]);
+
+    const houseData = {
+      user: user.userId,
+      name: payload.houseName,
+    };
+
+    house = await House.create(houseData);
+
+    postNotification("New House", "New house added.", user.userId);
+  }
 
   const roomData = {
     user: user.userId,
-    house: payload.houseId,
-    name: payload.name,
+    house: house._id,
+    name: payload.roomName,
     roomImage: files.roomImage[0].path,
   };
 
-  postNotification("New Room", "New room added to your house", user.userId);
+  postNotification("New Room", "New room added to your house.", user.userId);
 
   return await Room.create(roomData);
 };

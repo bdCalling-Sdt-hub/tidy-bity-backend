@@ -42,9 +42,6 @@ const UserSchema = new Schema(
     employeeId: {
       type: String,
     },
-    designation: {
-      type: String,
-    },
     jobType: {
       type: String,
     },
