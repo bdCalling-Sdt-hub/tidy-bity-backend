@@ -48,13 +48,19 @@ const UserSchema = new Schema(
     jobType: {
       type: String,
     },
-    CPR: {
+    CPRNumber: {
       type: String,
     },
-    passport: {
+    CPRExpDate: {
       type: String,
     },
-    drivingLicense: {
+    passportNumber: {
+      type: String,
+    },
+    passportExpDate: {
+      type: String,
+    },
+    note: {
       type: String,
     },
     dutyTime: {
