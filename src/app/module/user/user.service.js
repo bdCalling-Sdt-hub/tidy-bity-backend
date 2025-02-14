@@ -7,6 +7,7 @@ const validateFields = require("../../../util/validateFields");
 const { ENUM_USER_ROLE } = require("../../../util/enum");
 const EmailHelpers = require("../../../util/emailHelpers");
 const convertToArray = require("../../../util/convertToArray");
+const QueryBuilder = require("../../../builder/queryBuilder");
 
 const updateProfile = async (req) => {
   const { files, body: data } = req;
@@ -198,7 +199,27 @@ const editEmployee = async (req) => {
 
 const deleteEmployee = async (userData, payload) => {};
 
-const getMyEmployee = async (userData) => {};
+const getMyEmployee = async (userData, query) => {
+  const myEmployeesQuery = new QueryBuilder(
+    User.find({ employer: userData.userId }),
+    query
+  )
+    .search(["employeeId", "firstName"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [result, meta] = await Promise.all([
+    myEmployeesQuery.modelQuery,
+    myEmployeesQuery.countTotal(),
+  ]);
+
+  return {
+    meta,
+    result,
+  };
+};
 
 const getSingleEmployee = async (query) => {};
 
