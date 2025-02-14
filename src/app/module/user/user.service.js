@@ -94,6 +94,7 @@ const addEmployee = async (req) => {
     "CPRExpDate",
     "passportNumber",
     "passportExpDate",
+    "note",
     "dutyTime",
     "workingDay",
     "offDay",
@@ -148,36 +149,27 @@ const addEmployee = async (req) => {
 
 const editEmployee = async (req) => {
   const { body: payload, files, user: userData } = req;
-  const { workingDay } = payload || {};
 
   validateFields(payload, ["authId", "userId"]);
 
-  // return {
-  //   type: typeof payload.workingDay,
-  //   payload: payload.workingDay,
-  //   payload2: JSON.parse(payload.workingDay),
-  // };
+  const { workingDay, ...others } = payload || {};
+
+  if (payload.email || payload.password)
+    throw new ApiError(status.BAD_REQUEST, "Email & Password can't be changed");
 
   const updateData = {
     ...(workingDay && {
-      workingDay:
-        // typeof workingDay === "string" ? JSON.parse(workingDay) : workingDay,
-        typeof workingDay === "string" ? workingDay : JSON.parse(workingDay),
+      workingDay: convertToArray(payload.workingDay),
     }),
-    ...payload,
+    ...others,
   };
-
-  return updateData;
 
   const employee = await User.findOne({
     _id: payload.userId,
     authId: payload.authId,
   });
 
-  if (!employee) throw new ApiError(status.BAD_REQUEST, "Employee not found");
-
-  if (payload.email || payload.password)
-    throw new ApiError(status.BAD_REQUEST, "Email & Password can't be changed");
+  if (!employee) throw new ApiError(status.BAD_REQUEST, "Employee not found.");
 
   if (files && files.profile_image)
     updateData.profile_image = files.profile_image[0].path;
@@ -189,21 +181,17 @@ const editEmployee = async (req) => {
       {
         new: true,
       }
-    ),
+    ).lean(),
     User.findByIdAndUpdate(
       payload.userId,
       { ...updateData },
       {
         new: true,
       }
-    ),
+    ).lean(),
   ]);
 
-  if (!auth || !updatedEmployee)
-    throw new ApiError(status.NOT_FOUND, "User not found!");
-
   return {
-    auth,
     updatedEmployee,
   };
 };
