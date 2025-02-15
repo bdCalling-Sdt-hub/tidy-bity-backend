@@ -91,6 +91,7 @@ const getSingleRoom = async (query) => {
   validateFields(query, ["roomId"]);
 
   const room = await Room.findById(query.roomId);
+  
   if (!room) throw new ApiError(status.NOT_FOUND, "Room not found");
 
   return room;

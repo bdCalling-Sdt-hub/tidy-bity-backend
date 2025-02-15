@@ -79,6 +79,7 @@ const registrationAccount = async (payload) => {
     authId: auth._id,
     firstName,
     lastName,
+    ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
     email,
   };
 
