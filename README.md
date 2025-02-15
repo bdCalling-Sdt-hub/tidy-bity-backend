@@ -1,7 +1,9 @@
-### need modifications
+## todo
 
-1. auth
-2. errorhandler updated with network error
+1. when adding task only two recurrence: onetime, weekly
+2. when adding task provide start and end time both
+
+##
 
 Visionary Vikings
 Efficiency Elves
