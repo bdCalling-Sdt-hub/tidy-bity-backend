@@ -36,7 +36,7 @@ const addEmployee = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Employee added",
+    message: "Employee added successfully",
     data: result,
   });
 });
@@ -46,7 +46,7 @@ const editEmployee = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Employee updated",
+    message: "Employee updated successfully",
     data: result,
   });
 });
@@ -56,7 +56,7 @@ const deleteEmployee = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Employee deleted",
+    message: "Employee deleted successfully",
     data: result,
   });
 });
@@ -66,7 +66,7 @@ const getMyEmployee = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Employees retrieved",
+    message: "Employees retrieved successfully",
     data: result,
   });
 });
@@ -76,7 +76,7 @@ const getSingleEmployee = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Employees retrieved",
+    message: "Employees retrieved successfully",
     data: result,
   });
 });
