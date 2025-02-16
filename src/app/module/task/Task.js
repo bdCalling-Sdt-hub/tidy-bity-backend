@@ -20,7 +20,12 @@ const TaskSchema = new Schema(
     },
     recurrence: {
       type: String,
-      enum: [TaskRecurrence.ONE_TIME, TaskRecurrence.WEEKLY],
+      enum: {
+        values: [TaskRecurrence.ONE_TIME, TaskRecurrence.WEEKLY],
+        message: `Invalid recurrence value. Allowed values: ${Object.values(
+          TaskRecurrence
+        ).join(", ")}`,
+      },
       default: TaskRecurrence.ONE_TIME,
     },
     startDateStr: {
@@ -49,15 +54,6 @@ const TaskSchema = new Schema(
     },
     dayOfWeek: {
       type: String,
-      enum: [
-        DaysOfWeek.SUNDAY,
-        DaysOfWeek.MONDAY,
-        DaysOfWeek.TUESDAY,
-        DaysOfWeek.WEDNESDAY,
-        DaysOfWeek.THURSDAY,
-        DaysOfWeek.FRIDAY,
-        DaysOfWeek.SATURDAY,
-      ],
       required: true,
     },
     taskDetails: {
