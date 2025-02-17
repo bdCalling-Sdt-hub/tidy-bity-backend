@@ -62,6 +62,32 @@ const updateTask = catchAsync(async (req, res) => {
   });
 });
 
+const updateTaskOrGroceryStatus = catchAsync(async (req, res) => {
+  const result = await TaskService.updateTaskOrGroceryStatus(
+    req.user,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Status updated successfully",
+    data: result,
+  });
+});
+
+const updateTaskOrGroceryWithNote = catchAsync(async (req, res) => {
+  const result = await TaskService.updateTaskOrGroceryWithNote(
+    req.user,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Updated successfully",
+    data: result,
+  });
+});
+
 const deleteTask = catchAsync(async (req, res) => {
   const result = await TaskService.deleteTask(req.user, req.body);
   sendResponse(res, {
@@ -72,6 +98,56 @@ const deleteTask = catchAsync(async (req, res) => {
   });
 });
 
+const postGrocery = catchAsync(async (req, res) => {
+  const result = await TaskService.postGrocery(req.user, req.body);
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Grocery item added successfully",
+    data: result,
+  });
+});
+
+const getGrocery = catchAsync(async (req, res) => {
+  const result = await TaskService.getGrocery(req.user, req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Grocery items retrieved successfully",
+    data: result,
+  });
+});
+
+const getMyGrocery = catchAsync(async (req, res) => {
+  const result = await TaskService.getMyGrocery(req.user, req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Your grocery items retrieved successfully",
+    data: result,
+  });
+});
+
+const updateGrocery = catchAsync(async (req, res) => {
+  const result = await TaskService.updateGrocery(req.user, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Grocery item updated successfully",
+    data: result,
+  });
+});
+
+const deleteGrocery = catchAsync(async (req, res) => {
+  const result = await TaskService.deleteGrocery(req.user, req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Grocery item deleted successfully",
+    result: result,
+  });
+});
+
 const TaskController = {
   postTask,
   getTask,
@@ -79,7 +155,14 @@ const TaskController = {
   getEmployeeSpecificTask,
   getAllTask,
   updateTask,
+  updateTaskOrGroceryStatus,
+  updateTaskOrGroceryWithNote,
   deleteTask,
+  postGrocery,
+  getGrocery,
+  getMyGrocery,
+  updateGrocery,
+  deleteGrocery,
 };
 
 module.exports = TaskController;

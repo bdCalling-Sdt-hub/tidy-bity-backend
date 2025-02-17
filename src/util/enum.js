@@ -9,6 +9,25 @@ const TaskRecurrence = {
   WEEKLY: "weekly",
 };
 
+const TaskStatus = {
+  PENDING: "pending",
+  CANCELLED: "cancelled",
+  ONGOING: "ongoing",
+  COMPLETED: "completed",
+};
+
+const GroceryRecurrence = {
+  ONE_TIME: "one_time",
+  WEEKLY: "weekly",
+};
+
+const GroceryStatus = {
+  PENDING: "pending",
+  CANCELLED: "cancelled",
+  ONGOING: "ongoing",
+  COMPLETED: "completed",
+};
+
 const DaysOfWeek = {
   SUNDAY: "Sunday",
   MONDAY: "Monday",
@@ -21,6 +40,9 @@ const DaysOfWeek = {
 
 module.exports = {
   ENUM_USER_ROLE,
-  TaskRecurrence,
   DaysOfWeek,
+  TaskRecurrence,
+  TaskStatus,
+  GroceryRecurrence,
+  GroceryStatus,
 };
