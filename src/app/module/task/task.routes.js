@@ -28,6 +28,16 @@ router
     auth(config.auth_level.user),
     TaskController.updateTask
   )
+  .patch(
+    "/update-task-or-grocery-status",
+    auth(config.auth_level.employee),
+    TaskController.updateTaskOrGroceryStatus
+  )
+  .patch(
+    "/update-grocery-or-task-with-note",
+    auth(config.auth_level.employee),
+    TaskController.updateTaskOrGroceryWithNote
+  )
   .delete(
     "/delete-task",
     auth(config.auth_level.user),

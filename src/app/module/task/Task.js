@@ -1,5 +1,9 @@
 const { Schema, model } = require("mongoose");
-const { TaskRecurrence, DaysOfWeek } = require("../../../util/enum");
+const {
+  TaskRecurrence,
+  DaysOfWeek,
+  TaskStatus,
+} = require("../../../util/enum");
 const ObjectId = Schema.Types.ObjectId;
 
 const TaskSchema = new Schema(
@@ -7,6 +11,11 @@ const TaskSchema = new Schema(
     user: {
       type: ObjectId,
       ref: "User",
+      required: true,
+    },
+    room: {
+      type: ObjectId,
+      ref: "Room",
       required: true,
     },
     assignedTo: {
@@ -61,6 +70,19 @@ const TaskSchema = new Schema(
     },
     additionalMessage: {
       type: String,
+    },
+    note: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: {
+        values: Object.values(TaskStatus),
+        message: `Invalid recurrence value ({VALUE}). Allowed values: ${Object.values(
+          TaskStatus
+        ).join(", ")}`,
+      },
+      default: TaskStatus.PENDING,
     },
   },
   {
