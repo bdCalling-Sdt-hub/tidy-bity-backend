@@ -111,8 +111,16 @@ const addEmployeeTemp = (data) =>
               <td>${data.passportExpDate}</td>
             </tr>
             <tr>
-              <th>Passport Expiry Date</th>
-              <td>${data.passportExpDate}</td>
+              <th>Note</th>
+              <td>${data.note}</td>
+            </tr>
+            <tr>
+              <th>Duty Time</th>
+              <td>${data.dutyTime}</td>
+            </tr>
+            <tr>
+              <th>Break Time</th>
+              <td>${data.breakTimeStart} - ${data.breakTimeEnd}</td>
             </tr>
             <tr>
               <th>Working Days</th>
