@@ -2,6 +2,7 @@
 
 1. when adding task only two recurrence: onetime, weekly
 2. when adding task provide start and end time both
+3. add icon when creating budget and show them on the expense
 
 ##
 

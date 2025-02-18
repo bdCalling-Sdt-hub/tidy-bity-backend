@@ -74,12 +74,12 @@ const postRoom = async (req) => {
 };
 
 const getMyRoom = async (userData, query) => {
-  validateFields(query, ["houseId"]);
-
-  const rooms = await Room.find({
+  const queryObj = {
     user: userData.userId,
-    house: query.houseId,
-  });
+    ...(query.houseId && { house: query.houseId }),
+  };
+
+  const rooms = await Room.find(queryObj);
 
   return {
     count: rooms.length,
@@ -91,7 +91,7 @@ const getSingleRoom = async (query) => {
   validateFields(query, ["roomId"]);
 
   const room = await Room.findById(query.roomId);
-  
+
   if (!room) throw new ApiError(status.NOT_FOUND, "Room not found");
 
   return room;

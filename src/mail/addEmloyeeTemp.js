@@ -83,14 +83,6 @@ const addEmployeeTemp = (data) =>
               <td>${data.phoneNumber}</td>
             </tr>
             <tr>
-              <th>Address</th>
-              <td>${data.address}</td>
-            </tr>
-            <tr>
-              <th>Designation</th>
-              <td>${data.designation}</td>
-            </tr>
-            <tr>
               <th>Job Type</th>
               <td>${data.jobType}</td>
             </tr>
