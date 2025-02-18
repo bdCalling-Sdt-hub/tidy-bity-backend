@@ -8,6 +8,7 @@ const Task = require("./Task");
 const User = require("../user/User");
 const Grocery = require("../grocery/Grocery");
 const Room = require("../Room/Room");
+const postNotification = require("../../../util/postNotification");
 
 const postTask = async (userData, payload) => {
   validateFields(payload, [
@@ -71,6 +72,12 @@ const postTask = async (userData, payload) => {
       additionalMessage: payload.additionalMessage,
     }),
   };
+
+  postNotification(
+    "New Task",
+    "You have been assigned a new task",
+    payload.assignedTo
+  );
 
   const task = await Task.create(taskData);
 
@@ -208,6 +215,13 @@ const updateTask = async (userData, payload) => {
 
   if (!updatedTask) throw new ApiError(status.NOT_FOUND, "Task not found");
 
+  postNotification(
+    "Task Updated",
+    "Task has been updated",
+    updatedTask.assignedTo
+  );
+  postNotification("Task Updated", "Task has been updated", updatedTask.user);
+
   return updatedTask;
 };
 
@@ -228,10 +242,13 @@ const updateTaskOrGroceryStatus = async (userData, payload) => {
     { note: payload.note },
     { new: true, runValidators: true }
   )
-    .select("status")
+    .select("status assignedTo user")
     .lean();
 
   if (!result) throw new ApiError(status.NOT_FOUND, "Not found");
+
+  postNotification("Task Updated", `Task ${result.status}`, result.assignedTo);
+  postNotification("Task Updated", `Task ${result.status}`, result.user);
 
   return result;
 };
@@ -321,6 +338,12 @@ const postGrocery = async (userData, payload) => {
     }),
   };
 
+  postNotification(
+    "New grocery",
+    "You have been assigned a new grocery",
+    payload.assignedTo
+  );
+
   const grocery = await Grocery.create(groceryData);
 
   return grocery;
@@ -399,6 +422,17 @@ const updateGrocery = async (userData, payload) => {
 
   if (!updatedGrocery)
     throw new ApiError(status.NOT_FOUND, "Grocery not found");
+
+  postNotification(
+    "Task Updated",
+    "Task has been updated",
+    updatedGrocery.assignedTo
+  );
+  postNotification(
+    "Task Updated",
+    "Task has been updated",
+    updatedGrocery.user
+  );
 
   return updatedGrocery;
 };

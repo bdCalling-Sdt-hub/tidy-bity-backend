@@ -42,6 +42,31 @@ router
     "/delete-task",
     auth(config.auth_level.user),
     TaskController.deleteTask
+  )
+  .post(
+    "/post-grocery",
+    auth(config.auth_level.user),
+    TaskController.postGrocery
+  )
+  .get(
+    "/get-grocery",
+    auth(config.auth_level.employee),
+    TaskController.getGrocery
+  )
+  .get(
+    "/get-my-grocery",
+    auth(config.auth_level.user),
+    TaskController.getMyGrocery
+  )
+  .patch(
+    "/update-grocery",
+    auth(config.auth_level.user),
+    TaskController.updateGrocery
+  )
+  .delete(
+    "/delete-grocery",
+    auth(config.auth_level.user),
+    TaskController.deleteGrocery
   );
 
 module.exports = router;
