@@ -6,7 +6,7 @@ const handleMulterError = (err) => {
 
   switch (code) {
     case "LIMIT_UNEXPECTED_FILE":
-      message = `File limit for ${field} field exceeded`;
+      message = `Unknown field: ${field}`;
       break;
     case "LIMIT_FILE_SIZE":
       message = `File size too large for field: ${field}`;

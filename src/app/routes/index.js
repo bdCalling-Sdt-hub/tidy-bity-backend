@@ -7,6 +7,7 @@ const DashboardRoutes = require("../module/dashboard/dashboard.routes");
 const ManageRoutes = require("../module/manage/manage.routes");
 const RoomRoutes = require("../module/Room/room.routes");
 const TaskRoutes = require("../module/task/task.routes");
+const WalletRoutes = require("../module/wallet/wallet.routes");
 
 const moduleRoutes = [
   {
@@ -36,6 +37,10 @@ const moduleRoutes = [
   {
     path: "/task",
     route: TaskRoutes,
+  },
+  {
+    path: "/wallet",
+    route: WalletRoutes,
   },
 ];
 

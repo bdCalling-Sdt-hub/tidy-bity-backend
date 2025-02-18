@@ -239,7 +239,7 @@ const updateTaskOrGroceryStatus = async (userData, payload) => {
 
   const result = await Model.findOneAndUpdate(
     { _id: workId },
-    { note: payload.note },
+    { status: payload.status },
     { new: true, runValidators: true }
   )
     .select("status assignedTo user")
