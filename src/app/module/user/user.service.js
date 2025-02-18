@@ -95,6 +95,8 @@ const addEmployee = async (req) => {
     "passportExpDate",
     "note",
     "dutyTime",
+    "breakTimeStart",
+    "breakTimeEnd",
     "workingDay",
     "offDay",
   ]);
@@ -125,6 +127,8 @@ const addEmployee = async (req) => {
     passportExpDate: payload.passportExpDate,
     note: payload.note,
     dutyTime: payload.dutyTime,
+    breakTimeStart: payload.breakTimeStart,
+    breakTimeEnd: payload.breakTimeEnd,
     workingDay: convertToArray(payload.workingDay),
     offDay: payload.offDay,
   };

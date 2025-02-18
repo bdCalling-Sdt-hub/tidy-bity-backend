@@ -63,6 +63,12 @@ const UserSchema = new Schema(
     dutyTime: {
       type: String,
     },
+    breakTimeStart: {
+      type: String,
+    },
+    breakTimeEnd: {
+      type: String,
+    },
     workingDay: {
       type: [String],
       enum: [
