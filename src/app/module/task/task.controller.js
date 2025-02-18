@@ -139,12 +139,12 @@ const updateGrocery = catchAsync(async (req, res) => {
 });
 
 const deleteGrocery = catchAsync(async (req, res) => {
-  const result = await TaskService.deleteGrocery(req.user, req.query);
+  const result = await TaskService.deleteGrocery(req.user, req.body);
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Grocery item deleted successfully",
-    result: result,
+    data: result,
   });
 });
 
