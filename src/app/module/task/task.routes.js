@@ -18,11 +18,7 @@ router
     auth(config.auth_level.employee),
     TaskController.getEmployeeSpecificTask
   )
-  .get(
-    "/get-all-task",
-    auth(config.auth_level.admin),
-    TaskController.getAllTask
-  )
+  .get("/get-all-task", auth(config.auth_level.user), TaskController.getAllTask)
   .patch(
     "/update-task",
     auth(config.auth_level.user),
