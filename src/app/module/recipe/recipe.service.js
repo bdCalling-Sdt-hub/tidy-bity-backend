@@ -2,7 +2,10 @@ const { default: status } = require("http-status");
 const ApiError = require("../../../error/ApiError");
 const validateFields = require("../../../util/validateFields");
 
-const postRecipe = async (req) => {};
+const postRecipe = async (req) => {
+  const { user, body, files } = req || {};
+    validateFields
+};
 
 const getRecipe = async (userData, query) => {};
 

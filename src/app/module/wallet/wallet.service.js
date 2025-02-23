@@ -10,14 +10,19 @@ const QueryBuilder = require("../../../builder/queryBuilder");
 const postBudget = async (req) => {
   const { body: payload, files, user } = req;
 
-  validateFields(files, ["budgetImage"]);
-  validateFields(payload, ["category", "budgetDateStr", "currency", "amount"]);
+  validateFields(payload, [
+    "category",
+    "budgetDateStr",
+    "currency",
+    "amount",
+    "budgetImage",
+  ]);
   dateTimeValidator(payload.budgetDateStr);
 
   const budgetData = {
     user: user.userId,
     category: payload.category,
-    budgetImage: files.budgetImage[0].path,
+    budgetImage: payload.budgetImage,
     budgetDateStr: payload.budgetDateStr,
     currency: payload.currency,
     amount: Math.round(payload.amount),
@@ -194,6 +199,61 @@ const deleteExpense = async (userData, payload) => {
   return result;
 };
 
+const getBudgetCategory = async () => {
+  return [
+    {
+      name: "Travel",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/Travel_kacb8h.png",
+    },
+    {
+      name: "Investments",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/Investment_u6yhxm.png",
+    },
+    {
+      name: "Housing",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/house_fqgtbk.png",
+    },
+    {
+      name: "Life & Entertainment",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/Entertainment_lbnfng.png",
+    },
+    {
+      name: "Vehicle",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/Vehicle_jbh5hc.png",
+    },
+    {
+      name: "Financial Expense",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/expenses_ixx4ai.png",
+    },
+    {
+      name: "Communication",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/Communication_c5ehzn.png",
+    },
+    {
+      name: "Food and Drinks",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299118/food_dnoods.png",
+    },
+    {
+      name: "Shopping",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299119/shopping_np9s7x.png",
+    },
+    {
+      name: "Transportation",
+      image:
+        "https://res.cloudinary.com/dsmqrbppz/image/upload/v1740299119/transportation_sp0va8.png",
+    },
+  ];
+};
+
 const WalletService = {
   postBudget,
   getBudget,
@@ -205,6 +265,7 @@ const WalletService = {
   getExpense,
   getSingleBudgetExpense,
   deleteExpense,
+  getBudgetCategory,
 };
 
 module.exports = WalletService;

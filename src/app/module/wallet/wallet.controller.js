@@ -105,6 +105,16 @@ const deleteExpense = catchAsync(async (req, res) => {
   });
 });
 
+const getBudgetCategory = catchAsync(async (req, res) => {
+  const result = await WalletService.getBudgetCategory();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Budget category retrieved successfully",
+    data: result,
+  });
+});
+
 const WalletController = {
   postBudget,
   getBudget,
@@ -116,6 +126,7 @@ const WalletController = {
   getExpense,
   getSingleBudgetExpense,
   deleteExpense,
+  getBudgetCategory,
 };
 
 module.exports = WalletController;
