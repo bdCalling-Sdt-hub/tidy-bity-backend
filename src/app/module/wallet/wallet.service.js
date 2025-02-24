@@ -58,7 +58,7 @@ const getMyBudget = async (userData, query) => {
   )
     .search([])
     .filter()
-    .sort()
+    .sort("-createdAt")
     .paginate()
     .fields();
 
@@ -143,6 +143,10 @@ const postExpense = async (userData, payload) => {
     expenseDateStr: payload.expenseDateStr,
     amount: Math.round(payload.amount),
   };
+
+  const budgetAfterNewExpense = budget.currentExpense + expenseData.amount;
+  if (budgetAfterNewExpense >= budget.amount)
+    throw new ApiError(status.BAD_REQUEST, `Expense can not be higher than budget`);
 
   const expense = await Expense.create(expenseData);
 

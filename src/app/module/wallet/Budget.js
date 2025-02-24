@@ -10,6 +10,7 @@ const BudgetSchema = new Schema(
     },
     category: {
       type: String,
+      unique: true,
       required: true,
     },
     budgetImage: {
