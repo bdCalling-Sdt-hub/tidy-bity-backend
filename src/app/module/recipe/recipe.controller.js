@@ -62,6 +62,15 @@ const deleteRecipe = catchAsync(async (req, res) => {
   });
 });
 
+const updateRecipeFavorite = catchAsync(async (req, res) => {
+  const result = await RecipeService.updateRecipeFavorite(req.user, req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: result.message,
+  });
+});
+
 const RecipeController = {
   postRecipe,
   getRecipe,
@@ -69,6 +78,7 @@ const RecipeController = {
   getAllRecipe,
   updateRecipe,
   deleteRecipe,
+  updateRecipeFavorite,
 };
 
 module.exports = RecipeController;

@@ -13,7 +13,11 @@ router
     uploadFile(),
     RecipeController.postRecipe
   )
-  .get("/get-recipe", auth(config.auth_level.user), RecipeController.getRecipe)
+  .get(
+    "/get-recipe",
+    auth(config.auth_level.employee),
+    RecipeController.getRecipe
+  )
   .get(
     "/get-my-recipe",
     auth(config.auth_level.user),
@@ -34,6 +38,11 @@ router
     "/delete-recipe",
     auth(config.auth_level.user),
     RecipeController.deleteRecipe
+  )
+  .patch(
+    "/favorite-unfavorite-recipe",
+    auth(config.auth_level.user),
+    RecipeController.updateRecipeFavorite
   );
 
 module.exports = router;
