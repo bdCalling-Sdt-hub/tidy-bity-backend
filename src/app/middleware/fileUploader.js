@@ -1,7 +1,13 @@
 const multer = require("multer");
 const fs = require("fs");
 
-const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+const allowedMimeTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp",
+  "image/svg",
+];
 
 const isValidFileType = (mimetype) => allowedMimeTypes.includes(mimetype);
 
@@ -18,8 +24,10 @@ const uploadFile = () => {
         uploadPath = "uploads/images/profile";
       else if (file.fieldname === "roomImage")
         uploadPath = "uploads/images/room";
-      else if (file.fieldname === "budgetImage")
-        uploadPath = "uploads/images/budget";
+      // else if (file.fieldname === "budgetImage")
+      //   uploadPath = "uploads/images/budget";
+      else if (file.fieldname === "recipeImage")
+        uploadPath = "uploads/images/recipe";
       else uploadPath = "uploads";
 
       createDirIfNotExists(uploadPath);
@@ -37,7 +45,12 @@ const uploadFile = () => {
   });
 
   const fileFilter = (req, file, cb) => {
-    const allowedFieldNames = ["profile_image", "roomImage", "budgetImage"];
+    const allowedFieldNames = [
+      "profile_image",
+      "roomImage",
+      // "budgetImage",
+      "recipeImage",
+    ];
 
     // Allow requests without files (when there's no fieldname)
     if (!file.fieldname) return cb(null, true);
@@ -57,7 +70,8 @@ const uploadFile = () => {
   }).fields([
     { name: "profile_image", maxCount: 1 },
     { name: "roomImage", maxCount: 1 },
-    { name: "budgetImage", maxCount: 1 },
+    // { name: "budgetImage", maxCount: 1 },
+    { name: "recipeImage", maxCount: 1 },
   ]);
 
   return upload;
