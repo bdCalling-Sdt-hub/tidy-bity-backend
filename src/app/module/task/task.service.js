@@ -1,4 +1,5 @@
 const { default: status } = require("http-status");
+const cron = require("node-cron");
 
 const ApiError = require("../../../error/ApiError");
 const QueryBuilder = require("../../../builder/queryBuilder");
@@ -9,6 +10,8 @@ const User = require("../user/User");
 const Grocery = require("../grocery/Grocery");
 const Room = require("../Room/Room");
 const postNotification = require("../../../util/postNotification");
+const { TaskRecurrence } = require("../../../util/enum");
+const { logger } = require("../../../shared/logger");
 
 const postTask = async (userData, payload) => {
   validateFields(payload, [
@@ -447,6 +450,31 @@ const deleteGrocery = async (userData, payload) => {
 
   return result;
 };
+
+//  utility functions ===================================================
+
+const deleteTasksWithCron = async (check) => {
+  const now = new Date();
+
+  const result = await Task.deleteMany({
+    recurrence: TaskRecurrence.ONE_TIME,
+    endDateTime: { $lte: now },
+  });
+
+  if (result.deletedCount > 0)
+    logger.info(`Deleted ${result.deletedCount} expired one_time task`);
+
+  logger.info(`${now}`);
+};
+
+// delete one_time tasks that are expired every midnight
+cron.schedule("0 0 * * *", async () => {
+  try {
+    deleteTasksWithCron();
+  } catch (error) {
+    errorLogger.error("Error removing expired code:", error);
+  }
+});
 
 const TaskService = {
   postTask,
