@@ -1,4 +1,5 @@
 const { status } = require("http-status");
+const cron = require("node-cron");
 
 const ApiError = require("../../../error/ApiError");
 const User = require("./User");
@@ -56,6 +57,17 @@ const getProfile = async (userData) => {
   if (!result || !auth) throw new ApiError(status.NOT_FOUND, "User not found");
   if (auth.isBlocked)
     throw new ApiError(status.FORBIDDEN, "You are blocked. Contact support");
+  if (
+    auth.role === ENUM_USER_ROLE.USER &&
+    !result.isSubscribed &&
+    result.trialExpires &&
+    result.trialExpires < new Date()
+  ) {
+    throw new ApiError(
+      status.FORBIDDEN,
+      "Trial period expired. Please subscribe"
+    );
+  }
 
   return result;
 };
@@ -242,6 +254,31 @@ const getSingleEmployee = async (query) => {
 
   return employee;
 };
+
+const updateTrialOrSubscriptionWithCron = async (check) => {
+  const now = new Date();
+
+  const updateTrial = await User.updateMany(
+    {
+      trialExpires: { $lte: now },
+    },
+    {}
+  );
+
+  // if (result.deletedCount > 0)
+  //   logger.info(`Deleted ${result.deletedCount} expired one_time task`);
+
+  // logger.info(`${now}`);
+};
+
+// update trial and subscription every midnight
+cron.schedule("0 0 * * *", async () => {
+  try {
+    // updateTrialOrSubscriptionWithCron();
+  } catch (error) {
+    errorLogger.error("Error updating trial and subscription", error);
+  }
+});
 
 const UserService = {
   getProfile,

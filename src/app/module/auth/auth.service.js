@@ -79,8 +79,13 @@ const registrationAccount = async (payload) => {
     authId: auth._id,
     firstName,
     lastName,
-    ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
     email,
+    ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
+    ...(role === ENUM_USER_ROLE.USER && {
+      firstLogin: null,
+      trialExpires: null,
+      isSubscribed: false,
+    }),
   };
 
   if (role === ENUM_USER_ROLE.ADMIN) await Admin.create(userData);
@@ -178,11 +183,13 @@ const loginAccount = async (payload) => {
   const auth = await Auth.isAuthExist(email);
 
   if (!auth) throw new ApiError(status.NOT_FOUND, "User does not exist");
+
   if (!auth.isActive)
     throw new ApiError(
       status.BAD_REQUEST,
       "Please activate your account then try to login"
     );
+
   if (auth.isBlocked)
     throw new ApiError(status.FORBIDDEN, "You are blocked. Contact support");
 
@@ -201,6 +208,21 @@ const loginAccount = async (payload) => {
     default:
       result = await User.findOne({ authId: auth._id }).populate("authId");
   }
+
+  if (
+    auth.role === ENUM_USER_ROLE.USER &&
+    !result.isSubscribed &&
+    result.trialExpires &&
+    result.trialExpires < new Date()
+  ) {
+    throw new ApiError(
+      status.FORBIDDEN,
+      "Trial period expired. Please subscribe"
+    );
+  }
+
+  if (auth.role === ENUM_USER_ROLE.USER && !result.firstLogin)
+    await trialActivationForNewUser(auth._id);
 
   const tokenPayload = {
     authId: auth._id,
@@ -330,6 +352,8 @@ const changePassword = async (userData, payload) => {
   isUserExist.save();
 };
 
+// utility ===============================================
+
 const updateFieldsWithCron = async (check) => {
   const now = new Date();
   let result;
@@ -369,6 +393,21 @@ const updateFieldsWithCron = async (check) => {
         check === "activation" ? "activation" : "verification"
       } code`
     );
+};
+
+const trialActivationForNewUser = async (authId) => {
+  const now = new Date();
+
+  const updateUser = await User.findOneAndUpdate(
+    { authId: authId },
+    {
+      firstLogin: now,
+      trialExpires: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // 5 days from now,
+    },
+    { new: true, runValidators: true }
+  );
+
+  console.log(updateUser);
 };
 
 // Unset activationCode activationCodeExpire field for expired activation code

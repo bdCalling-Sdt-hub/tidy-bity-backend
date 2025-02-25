@@ -33,6 +33,20 @@ const UserSchema = new Schema(
       type: String,
     },
 
+    /* user(owner) only fields -----------*/
+    firstLogin: {
+      type: Date,
+    },
+    trialExpires: {
+      type: Date,
+    },
+    isSubscribed: {
+      type: Boolean,
+    },
+    subscriptionExpires: {
+      type: Boolean,
+    },
+
     /* employee only fields -----------*/
 
     employer: {
