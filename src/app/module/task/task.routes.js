@@ -54,6 +54,11 @@ router
     auth(config.auth_level.user),
     TaskController.getMyGrocery
   )
+  .get(
+    "/get-notifications",
+    auth(config.auth_level.employee),
+    TaskController.getNotifications
+  )
   .patch(
     "/update-grocery",
     auth(config.auth_level.user),
