@@ -1,4 +1,4 @@
-const Notification = require("../app/notification/Notification");
+const Notification = require("../app/module/notification/Notification");
 const catchAsync = require("../shared/catchAsync");
 const validateFields = require("./validateFields");
 

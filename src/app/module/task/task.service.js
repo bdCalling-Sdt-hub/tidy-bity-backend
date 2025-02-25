@@ -12,6 +12,7 @@ const Room = require("../Room/Room");
 const postNotification = require("../../../util/postNotification");
 const { TaskRecurrence } = require("../../../util/enum");
 const { logger } = require("../../../shared/logger");
+const Notification = require("../notification/Notification");
 
 const postTask = async (userData, payload) => {
   validateFields(payload, [
@@ -451,6 +452,12 @@ const deleteGrocery = async (userData, payload) => {
   return result;
 };
 
+const getNotifications = async (userData) => {
+  const result = await Notification.find({ toId: userData.userId });
+
+  return result;
+};
+
 //  utility functions ===================================================
 
 const deleteTasksWithCron = async (check) => {
@@ -486,6 +493,7 @@ const TaskService = {
   updateTaskOrGroceryStatus,
   updateTaskOrGroceryWithNote,
   deleteTask,
+  getNotifications,
 
   postGrocery,
   getGrocery,

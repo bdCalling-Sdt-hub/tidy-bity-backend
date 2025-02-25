@@ -148,6 +148,16 @@ const deleteGrocery = catchAsync(async (req, res) => {
   });
 });
 
+const getNotifications = catchAsync(async (req, res) => {
+  const result = await TaskService.getNotifications(req.user);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Notification retrieved successfully",
+    data: result,
+  });
+});
+
 const TaskController = {
   postTask,
   getTask,
@@ -163,6 +173,7 @@ const TaskController = {
   getMyGrocery,
   updateGrocery,
   deleteGrocery,
+  getNotifications,
 };
 
 module.exports = TaskController;
