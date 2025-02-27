@@ -9,6 +9,7 @@ const RoomRoutes = require("../module/Room/room.routes");
 const TaskRoutes = require("../module/task/task.routes");
 const WalletRoutes = require("../module/wallet/wallet.routes");
 const RecipeRoutes = require("../module/recipe/recipe.routes");
+const PaymentRoutes = require("../module/payment/payment.routes");
 
 const moduleRoutes = [
   {
@@ -46,6 +47,10 @@ const moduleRoutes = [
   {
     path: "/recipe",
     route: RecipeRoutes,
+  },
+  {
+    path: "/payment",
+    route: PaymentRoutes,
   },
 ];
 
