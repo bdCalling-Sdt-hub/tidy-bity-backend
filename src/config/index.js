@@ -53,6 +53,11 @@ const config = {
   stripe: {
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
   },
+  paypal: {
+    mode: process.env.MODE,
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+  },
 };
 
 // Validate configuration

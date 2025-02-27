@@ -255,30 +255,40 @@ const getSingleEmployee = async (query) => {
   return employee;
 };
 
-const updateTrialOrSubscriptionWithCron = async (check) => {
-  const now = new Date();
+const updateSubscription = async (userData, payload) => {
+  validateFields(payload, ["subscriptionType", "price"]);
 
-  const updateTrial = await User.updateMany(
-    {
-      trialExpires: { $lte: now },
-    },
-    {}
-  );
+  const user = await User.findById(userData.userId);
 
-  // if (result.deletedCount > 0)
-  //   logger.info(`Deleted ${result.deletedCount} expired one_time task`);
+  if (!user) throw new ApiError(status.NOT_FOUND, "User not found");
 
-  // logger.info(`${now}`);
+  return user;
 };
 
-// update trial and subscription every midnight
-cron.schedule("0 0 * * *", async () => {
-  try {
-    // updateTrialOrSubscriptionWithCron();
-  } catch (error) {
-    errorLogger.error("Error updating trial and subscription", error);
-  }
-});
+// const updateSubscriptionStatusWithCron = async (check) => {
+//   const now = new Date();
+
+//   const updateTrial = await User.updateMany(
+//     {
+//       trialExpires: { $lte: now },
+//     },
+//     {}
+//   );
+
+//   // if (result.deletedCount > 0)
+//   //   logger.info(`Deleted ${result.deletedCount} expired one_time task`);
+
+//   // logger.info(`${now}`);
+// };
+
+// // update subscription status every midnight
+// cron.schedule("0 0 * * *", async () => {
+//   try {
+//     // updateSubscriptionStatusWithCron();
+//   } catch (error) {
+//     errorLogger.error("Error updating trial and subscription", error);
+//   }
+// });
 
 const UserService = {
   getProfile,
