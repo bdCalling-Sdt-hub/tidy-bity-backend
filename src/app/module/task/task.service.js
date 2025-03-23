@@ -10,9 +10,10 @@ const User = require("../user/User");
 const Grocery = require("../grocery/Grocery");
 const Room = require("../Room/Room");
 const postNotification = require("../../../util/postNotification");
-const { TaskRecurrence } = require("../../../util/enum");
+const { TaskRecurrence, ENUM_USER_ROLE } = require("../../../util/enum");
 const { logger } = require("../../../shared/logger");
 const Notification = require("../notification/Notification");
+const GroceryCategory = require("../grocery/GroceryCategory");
 
 const postTask = async (userData, payload) => {
   validateFields(payload, [
@@ -370,7 +371,12 @@ const getGrocery = async (userData, query) => {
 
 const getMyGrocery = async (userData, query) => {
   const groceryQuery = new QueryBuilder(
-    Grocery.find({ user: userData.userId })
+    Grocery.find({
+      ...(userData.role === ENUM_USER_ROLE.USER && { user: userData.userId }),
+      ...(userData.role === ENUM_USER_ROLE.EMPLOYEE && {
+        assignedTo: userData.userId,
+      }),
+    })
       .populate([
         {
           path: "assignedTo",
@@ -458,6 +464,30 @@ const getNotifications = async (userData) => {
   return result;
 };
 
+const postGroceryCategory = async (payload) => {
+  const groceryCategory = await GroceryCategory.create(...payload);
+  return groceryCategory;
+};
+
+const getGroceryCategory = async (query) => {
+  const groceryCategoryQuery = new QueryBuilder(GroceryCategory.find({}), query)
+    .search(["name"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [result, meta] = await Promise.all([
+    groceryCategoryQuery.modelQuery,
+    groceryCategoryQuery.countTotal(),
+  ]);
+
+  return {
+    meta,
+    result,
+  };
+};
+
 //  utility functions ===================================================
 
 const deleteTasksWithCron = async (check) => {
@@ -494,6 +524,9 @@ const TaskService = {
   updateTaskOrGroceryWithNote,
   deleteTask,
   getNotifications,
+
+  getGroceryCategory,
+  postGroceryCategory,
 
   postGrocery,
   getGrocery,

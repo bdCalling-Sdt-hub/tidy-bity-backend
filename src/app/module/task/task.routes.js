@@ -44,6 +44,16 @@ router
     TaskController.deleteTask
   )
   .post(
+    "/post-grocery-category",
+    auth(config.auth_level.employee),
+    TaskController.postGroceryCategory
+  )
+  .get(
+    "/get-grocery-category",
+    auth(config.auth_level.employee),
+    TaskController.getGroceryCategory
+  )
+  .post(
     "/post-grocery",
     auth(config.auth_level.user),
     TaskController.postGrocery
@@ -55,7 +65,7 @@ router
   )
   .get(
     "/get-my-grocery",
-    auth(config.auth_level.user),
+    auth(config.auth_level.employee),
     TaskController.getMyGrocery
   )
   .get(

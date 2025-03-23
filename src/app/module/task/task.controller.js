@@ -108,6 +108,26 @@ const postGrocery = catchAsync(async (req, res) => {
   });
 });
 
+const postGroceryCategory = catchAsync(async (req, res) => {
+  const result = await TaskService.postGroceryCategory(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Grocery category created successfully",
+    data: result,
+  });
+});
+
+const getGroceryCategory = catchAsync(async (req, res) => {
+  const result = await TaskService.getGroceryCategory(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Grocery category retrieved successfully",
+    data: result,
+  });
+});
+
 const getGrocery = catchAsync(async (req, res) => {
   const result = await TaskService.getGrocery(req.user, req.query);
   sendResponse(res, {
@@ -168,6 +188,10 @@ const TaskController = {
   updateTaskOrGroceryStatus,
   updateTaskOrGroceryWithNote,
   deleteTask,
+
+  getGroceryCategory,
+  postGroceryCategory,
+
   postGrocery,
   getGrocery,
   getMyGrocery,
