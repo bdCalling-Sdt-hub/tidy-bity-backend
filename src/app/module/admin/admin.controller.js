@@ -1,6 +1,6 @@
 const sendResponse = require("../../../shared/sendResponse");
 const { AdminService } = require("./admin.service");
-const catchAsync = require("../../../shared/catchasync");
+const catchAsync = require("../../../shared/catchAsync");
 
 const updateProfile = catchAsync(async (req, res) => {
   const result = await AdminService.updateProfile(req);
