@@ -7,9 +7,9 @@ const QueryBuilder = require("../../../builder/queryBuilder");
 const FavRecipe = require("./FavoriteRecipe");
 
 const postRecipe = async (req) => {
-  const { user, body, files } = req || {};
+  const { user, body, files } = req || {}; //destructuring the object
 
-  validateFields(files, ["recipeImage"]);
+  validateFields(files, ["recipeImage"]); //validate the files
   validateFields(body, [
     "recipeName",
     "cookingTime",
@@ -17,7 +17,7 @@ const postRecipe = async (req) => {
     "ingredients",
     "steps",
     "tags",
-  ]);
+  ]); //validate the body
 
   const recipeData = {
     user: user.userId,
@@ -28,21 +28,21 @@ const postRecipe = async (req) => {
     ingredients: convertToArray(body.ingredients),
     steps: convertToArray(body.steps),
     tags: convertToArray(body.tags),
-  };
+  }; //create the recipe data
 
-  const recipe = await Recipe.create(recipeData);
+  const recipe = await Recipe.create(recipeData); //create the recipe
 
   return recipe;
 };
 
 const getRecipe = async (userData, query) => {
-  validateFields(query, ["recipeId"]);
+  validateFields(query, ["recipeId"]);   //validate the query
 
-  const recipe = await Recipe.findById(query.recipeId);
+  const recipe = await Recipe.findById(query.recipeId); //find the recipe by id
 
-  if (!recipe) throw new ApiError(status.NOT_FOUND, "Recipe not found");
+  if (!recipe) throw new ApiError(status.NOT_FOUND, "Recipe not found"); //if the recipe is not found, throw an error
 
-  return recipe;
+  return recipe; //return the recipe
 };
 
 const getMyRecipe = async (userData, query) => {
@@ -50,19 +50,19 @@ const getMyRecipe = async (userData, query) => {
     Recipe.find({ user: userData.userId }).lean(),
     query
   )
-    .search(["recipeName"])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+    .search(["recipeName"]) //search the recipe by name
+    .filter() //filter the recipe
+    .sort() //sort the recipe
+    .paginate() //paginate the recipe
+    .fields(); //fields the recipe
 
   const [recipes, meta, userFavRecipes] = await Promise.all([
     recipeQuery.modelQuery,
     recipeQuery.countTotal(),
     FavRecipe.find({ user: userData.userId }),
-  ]);
+  ]); //get the recipes, meta and user favorite recipes
 
-  const recipeWithFavorite = getFavRecipeWithLike(recipes, userFavRecipes);
+  const recipeWithFavorite = getFavRecipeWithLike(recipes, userFavRecipes); //get the recipe with favorite
 
   return {
     meta,
