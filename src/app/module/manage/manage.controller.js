@@ -1,4 +1,4 @@
-const catchAsync = require("../../../shared/catchasync");
+const catchAsync = require("../../../shared/catchAsync");
 const sendResponse = require("../../../shared/sendResponse");
 const ManageService = require("./manage.service");
 
