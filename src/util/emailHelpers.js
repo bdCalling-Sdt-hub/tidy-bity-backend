@@ -4,6 +4,7 @@ const otpResendTemp = require("../mail/otpResendTemp");
 const resetPassEmailTemp = require("../mail/resetPassEmailTemp");
 const signUpEmailTemp = require("../mail/signUpEmailTemp");
 const { sendEmail } = require("../util/sendEmail");
+const addEmployeeTemp = require("../mail/addEmloyeeTemp");
 
 const sendActivationEmail = async (email, data) => {
   try {
@@ -41,10 +42,23 @@ const sendResetPasswordEmail = async (email, data) => {
   }
 };
 
+const sendAddEmployeeTemp = async (email, data) => {
+  try {
+    await sendEmail({
+      email,
+      subject: "Welcome To Tidy Bity",
+      html: addEmployeeTemp(data),
+    });
+  } catch (error) {
+    throw new ApiError(status.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
 const EmailHelpers = {
   sendActivationEmail,
   sendOtpResendEmail,
   sendResetPasswordEmail,
+  sendAddEmployeeTemp,
 };
 
 module.exports = EmailHelpers;

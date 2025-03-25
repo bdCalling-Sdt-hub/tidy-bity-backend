@@ -6,10 +6,10 @@ const app = require("./app");
 async function main() {
   try {
     await connectDB();
-    logger.info(`DB Connected Successfully at ${new Date().toLocaleString()}`);
+    logger.info(`✅ DB Connected Successfully at ${new Date().toLocaleString()}`);
 
     app.listen(Number(config.port), config.base_url, () => {
-      logger.info(`App listening on http://${config.base_url}:${config.port}`);
+      logger.info(`☑️  App listening on http://${config.base_url}:${config.port}`);
     });
 
     process.on("unhandledRejection", (error) => {

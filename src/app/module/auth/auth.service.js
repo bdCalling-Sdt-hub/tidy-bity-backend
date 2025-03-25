@@ -15,28 +15,30 @@ const validateFields = require("../../../util/validateFields");
 const EmailHelpers = require("../../../util/emailHelpers");
 
 const registrationAccount = async (payload) => {
-  const { role, name, password, confirmPassword, email } = payload;
+  const { role, firstName, lastName, password, confirmPassword, email } =
+    payload;
 
   validateFields(payload, [
     "password",
     "confirmPassword",
     "email",
-    "role",
-    "name",
+    "firstName",
+    "lastName",
   ]);
 
   const { code: activationCode, expiredAt: activationCodeExpire } =
     codeGenerator(3);
   const authData = {
     role,
-    name,
+    firstName,
+    lastName,
     email,
     password,
     activationCode,
     activationCodeExpire,
   };
   const data = {
-    user: name,
+    user: `${firstName} ${lastName}`,
     activationCode,
     activationCodeExpire: Math.round(
       (activationCodeExpire - Date.now()) / (60 * 1000)
@@ -75,8 +77,15 @@ const registrationAccount = async (payload) => {
 
   const userData = {
     authId: auth._id,
-    name,
+    firstName,
+    lastName,
     email,
+    ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
+    ...(role === ENUM_USER_ROLE.USER && {
+      firstLogin: null,
+      trialExpires: null,
+      isSubscribed: false,
+    }),
   };
 
   if (role === ENUM_USER_ROLE.ADMIN) await Admin.create(userData);
@@ -89,6 +98,28 @@ const registrationAccount = async (payload) => {
     isActive: false,
     message: "Account created successfully. Please check your email",
   };
+};
+
+const resendActivationCode = async (payload) => {
+  const email = payload.email;
+  const user = await Auth.findOne({ email: email });
+  if (!user) throw new ApiError(status.BAD_REQUEST, "Email not found!");
+
+  const { code: activationCode, expiredAt: activationCodeExpire } =
+    codeGenerator(3);
+  const data = {
+    user: `${user.firstName} ${user.lastName}`,
+    activationCode,
+    activationCodeExpire: Math.round(
+      (activationCodeExpire - Date.now()) / (60 * 1000)
+    ),
+  };
+
+  user.activationCode = activationCode;
+  user.activationCodeExpire = activationCodeExpire;
+  await user.save();
+
+  EmailHelpers.sendOtpResendEmail(email, data);
 };
 
 const activateAccount = async (payload) => {
@@ -152,11 +183,13 @@ const loginAccount = async (payload) => {
   const auth = await Auth.isAuthExist(email);
 
   if (!auth) throw new ApiError(status.NOT_FOUND, "User does not exist");
+
   if (!auth.isActive)
     throw new ApiError(
       status.BAD_REQUEST,
       "Please activate your account then try to login"
     );
+
   if (auth.isBlocked)
     throw new ApiError(status.FORBIDDEN, "You are blocked. Contact support");
 
@@ -175,6 +208,21 @@ const loginAccount = async (payload) => {
     default:
       result = await User.findOne({ authId: auth._id }).populate("authId");
   }
+
+  if (
+    auth.role === ENUM_USER_ROLE.USER &&
+    !result.isSubscribed &&
+    result.trialExpires &&
+    result.trialExpires < new Date()
+  ) {
+    throw new ApiError(
+      status.FORBIDDEN,
+      "Trial period expired. Please subscribe"
+    );
+  }
+
+  if (auth.role === ENUM_USER_ROLE.USER && !result.firstLogin)
+    await trialActivationForNewUser(auth._id);
 
   const tokenPayload = {
     authId: auth._id,
@@ -217,7 +265,7 @@ const forgotPass = async (payload) => {
   await user.save();
 
   const data = {
-    name: user.name,
+    user: `${user.firstName} ${user.lastName}`,
     verificationCode,
     verificationCodeExpire: Math.round(
       (verificationCodeExpire - Date.now()) / (60 * 1000)
@@ -304,6 +352,8 @@ const changePassword = async (userData, payload) => {
   isUserExist.save();
 };
 
+// utility ===============================================
+
 const updateFieldsWithCron = async (check) => {
   const now = new Date();
   let result;
@@ -345,6 +395,21 @@ const updateFieldsWithCron = async (check) => {
     );
 };
 
+const trialActivationForNewUser = async (authId) => {
+  const now = new Date();
+
+  const updateUser = await User.findOneAndUpdate(
+    { authId: authId },
+    {
+      firstLogin: now,
+      trialExpires: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // 5 days from now,
+    },
+    { new: true, runValidators: true }
+  );
+
+  console.log(updateUser);
+};
+
 // Unset activationCode activationCodeExpire field for expired activation code
 // Unset isVerified, verificationCode, verificationCodeExpire field for expired verification code
 cron.schedule("* * * * *", async () => {
@@ -364,6 +429,7 @@ const AuthService = {
   resetPassword,
   activateAccount,
   forgetPassOtpVerify,
+  resendActivationCode,
 };
 
 module.exports = { AuthService };

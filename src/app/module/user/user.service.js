@@ -1,8 +1,14 @@
 const { status } = require("http-status");
+const cron = require("node-cron");
 
 const ApiError = require("../../../error/ApiError");
 const User = require("./User");
 const Auth = require("../auth/Auth");
+const validateFields = require("../../../util/validateFields");
+const { ENUM_USER_ROLE } = require("../../../util/enum");
+const EmailHelpers = require("../../../util/emailHelpers");
+const convertToArray = require("../../../util/convertToArray");
+const QueryBuilder = require("../../../builder/queryBuilder");
 
 const updateProfile = async (req) => {
   const { files, body: data } = req;
@@ -18,7 +24,10 @@ const updateProfile = async (req) => {
   const [auth, user] = await Promise.all([
     Auth.findByIdAndUpdate(
       authId,
-      { name: updateData.name },
+      {
+        firstName: updateData.firstName,
+        lastName: updateData.lastName,
+      },
       {
         new: true,
       }
@@ -48,6 +57,17 @@ const getProfile = async (userData) => {
   if (!result || !auth) throw new ApiError(status.NOT_FOUND, "User not found");
   if (auth.isBlocked)
     throw new ApiError(status.FORBIDDEN, "You are blocked. Contact support");
+  if (
+    auth.role === ENUM_USER_ROLE.USER &&
+    !result.isSubscribed &&
+    result.trialExpires &&
+    result.trialExpires < new Date()
+  ) {
+    throw new ApiError(
+      status.FORBIDDEN,
+      "Trial period expired. Please subscribe"
+    );
+  }
 
   return result;
 };
@@ -70,10 +90,215 @@ const deleteMyAccount = async (payload) => {
   ]);
 };
 
+const addEmployee = async (req) => {
+  const { body: payload, files, user } = req;
+
+  validateFields(files, ["profile_image"]);
+  validateFields(payload, [
+    "firstName",
+    "lastName",
+    "email",
+    "password",
+    "phoneNumber",
+    "jobType",
+    "CPRNumber",
+    "CPRExpDate",
+    "passportNumber",
+    "passportExpDate",
+    "note",
+    "dutyTime",
+    "breakTimeStart",
+    "breakTimeEnd",
+    "workingDay",
+    "offDay",
+  ]);
+
+  const authData = {
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    password: payload.password,
+    role: ENUM_USER_ROLE.EMPLOYEE,
+    isActive: true,
+  };
+
+  const auth = await Auth.create(authData);
+
+  const employeeData = {
+    authId: auth._id,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    profile_image: files.profile_image[0].path,
+    phoneNumber: payload.phoneNumber,
+    employer: user.userId,
+    jobType: payload.jobType,
+    CPRNumber: payload.CPRNumber,
+    CPRExpDate: payload.CPRExpDate,
+    passportNumber: payload.passportNumber,
+    passportExpDate: payload.passportExpDate,
+    note: payload.note,
+    dutyTime: payload.dutyTime,
+    breakTimeStart: payload.breakTimeStart,
+    breakTimeEnd: payload.breakTimeEnd,
+    workingDay: convertToArray(payload.workingDay),
+    offDay: payload.offDay,
+  };
+
+  const employee = await User.create(employeeData);
+
+  employee.employeeId = employee._id.toString().toUpperCase();
+  await employee.save();
+
+  EmailHelpers.sendAddEmployeeTemp(payload.email, {
+    password: payload.password,
+    workDays: employeeData.workingDay.join(", "),
+    name: `${payload.firstName} ${payload.lastName}`,
+    ...employee.toObject(),
+  });
+
+  return employee;
+};
+
+const editEmployee = async (req) => {
+  const { body: payload, files, user: userData } = req;
+
+  validateFields(payload, ["authId", "userId"]);
+
+  const { workingDay, ...others } = payload || {};
+
+  if (payload.email || payload.password)
+    throw new ApiError(status.BAD_REQUEST, "Email & Password can't be changed");
+
+  const updateData = {
+    ...(workingDay && {
+      workingDay: convertToArray(payload.workingDay),
+    }),
+    ...others,
+  };
+
+  const employee = await User.findOne({
+    _id: payload.userId,
+    authId: payload.authId,
+  });
+
+  if (!employee) throw new ApiError(status.BAD_REQUEST, "Employee not found.");
+
+  if (files && files.profile_image)
+    updateData.profile_image = files.profile_image[0].path;
+
+  const [auth, updatedEmployee] = await Promise.all([
+    Auth.findByIdAndUpdate(
+      payload.authId,
+      { firstName: updateData.firstName, lastName: updateData.lastName },
+      {
+        new: true,
+      }
+    ).lean(),
+    User.findByIdAndUpdate(
+      payload.userId,
+      { ...updateData },
+      {
+        new: true,
+      }
+    ).lean(),
+  ]);
+
+  return {
+    updatedEmployee,
+  };
+};
+
+const deleteEmployee = async (userData, payload) => {
+  validateFields(payload, ["userId", "authId"]);
+
+  const deletedUser = await User.deleteOne({
+    _id: payload.userId,
+    employer: userData.userId,
+  });
+
+  if (!deletedUser.deletedCount)
+    throw new ApiError(status.NOT_FOUND, "Employee Not found");
+
+  const deletedAuth = await Auth.deleteOne({ _id: payload.authId });
+};
+
+const getMyEmployee = async (userData, query) => {
+  const myEmployeesQuery = new QueryBuilder(
+    User.find({ employer: userData.userId }),
+    query
+  )
+    .search(["employeeId", "firstName"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [result, meta] = await Promise.all([
+    myEmployeesQuery.modelQuery,
+    myEmployeesQuery.countTotal(),
+  ]);
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getSingleEmployee = async (query) => {
+  validateFields(query, ["userId"]);
+
+  const employee = await User.findById(query.userId);
+
+  if (!employee) throw new ApiError(status.NOT_FOUND, "Employee not found");
+
+  return employee;
+};
+
+const updateSubscription = async (userData, payload) => {
+  validateFields(payload, ["subscriptionType", "price"]);
+
+  const user = await User.findById(userData.userId);
+
+  if (!user) throw new ApiError(status.NOT_FOUND, "User not found");
+
+  return user;
+};
+
+// const updateSubscriptionStatusWithCron = async (check) => {
+//   const now = new Date();
+
+//   const updateTrial = await User.updateMany(
+//     {
+//       trialExpires: { $lte: now },
+//     },
+//     {}
+//   );
+
+//   // if (result.deletedCount > 0)
+//   //   logger.info(`Deleted ${result.deletedCount} expired one_time task`);
+
+//   // logger.info(`${now}`);
+// };
+
+// // update subscription status every midnight
+// cron.schedule("0 0 * * *", async () => {
+//   try {
+//     // updateSubscriptionStatusWithCron();
+//   } catch (error) {
+//     errorLogger.error("Error updating trial and subscription", error);
+//   }
+// });
+
 const UserService = {
   getProfile,
   deleteMyAccount,
   updateProfile,
+  addEmployee,
+  editEmployee,
+  deleteEmployee,
+  getMyEmployee,
+  getSingleEmployee,
 };
 
 module.exports = { UserService };

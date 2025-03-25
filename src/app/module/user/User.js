@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-
-const { Schema, model, Types } = mongoose;
+const { Schema, model, Types } = require("mongoose");
+const ObjectId = Schema.Types.ObjectId;
 
 const UserSchema = new Schema(
   {
@@ -9,7 +8,11 @@ const UserSchema = new Schema(
       required: true,
       ref: "Auth",
     },
-    name: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
@@ -27,6 +30,72 @@ const UserSchema = new Schema(
       type: String,
     },
     address: {
+      type: String,
+    },
+
+    /* user(owner) only fields -----------*/
+    firstLogin: {
+      type: Date,
+    },
+    trialExpires: {
+      type: Date,
+    },
+    isSubscribed: {
+      type: Boolean,
+    },
+    subscriptionExpires: {
+      type: Boolean,
+    },
+
+    /* employee only fields -----------*/
+
+    employer: {
+      type: ObjectId,
+      ref: "User",
+    },
+    employeeId: {
+      type: String,
+    },
+    jobType: {
+      type: String,
+    },
+    CPRNumber: {
+      type: String,
+    },
+    CPRExpDate: {
+      type: String,
+    },
+    passportNumber: {
+      type: String,
+    },
+    passportExpDate: {
+      type: String,
+    },
+    note: {
+      type: String,
+    },
+    dutyTime: {
+      type: String,
+    },
+    breakTimeStart: {
+      type: String,
+    },
+    breakTimeEnd: {
+      type: String,
+    },
+    workingDay: {
+      type: [String],
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+    },
+    offDay: {
       type: String,
     },
   },

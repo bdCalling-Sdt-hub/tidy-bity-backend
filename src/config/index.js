@@ -21,6 +21,7 @@ const config = {
   database_url: process.env.MONGO_URL,
   database_password: process.env.DB_PASSWORD,
   auth_level: {
+    employee: ["USER", "EMPLOYEE", "ADMIN", "SUPER_ADMIN"],
     user: ["USER", "ADMIN", "SUPER_ADMIN"],
     admin: ["ADMIN", "SUPER_ADMIN"],
     super_admin: ["SUPER_ADMIN"],
@@ -51,6 +52,11 @@ const config = {
   },
   stripe: {
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
+  },
+  paypal: {
+    mode: process.env.MODE,
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
   },
 };
 
